@@ -1,0 +1,82 @@
+<mvc:View controllerName="Quickstart.App" displayBlock="true" xmlns:mvc="sap.ui.core.mvc" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core" xmlns:tnt="sap.tnt" xmlns:custom="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1" xmlns="sap.m">
+  <App id="app">
+    <Page title="我的豆瓣电影数据分析">
+      <headerContent>
+        <ToggleButton id="idButtonCoupleMode" icon="sap-icon://heart" text="情侣模式" press="onCoupleModePress"></ToggleButton>
+        <Button icon="sap-icon://action-settings" press="onSettingsPress"></Button>
+      </headerContent>
+      <content>
+        <SplitContainer id="idSplitContainer" initialDetail="detail" initialMaster="master">
+          <detailPages>
+            <Page id="idSummaryPage" showHeader="false" backgroundDesign="Solid" showNavButton="false">
+              <Panel>
+                <VBox>
+                  <Text id="idSummaryText"></Text>
+                  <Text id="idCompareText"></Text>
+                </VBox>
+              </Panel>
+              <Panel>
+                <VBox>
+                  <Text id="idShortestCommentText"></Text>
+                  <Text id="idCommentLengthText"></Text>
+                  <Text id="idCommentText"></Text>
+                </VBox>
+              </Panel>
+            </Page>
+            <Page id="idMapPage" showHeader="false" backgroundDesign="Solid" showNavButton="false">
+              <Toolbar>
+                <SegmentedButton selectedKey="map" selectionChange="onCountryOptionChanged">
+                  <items>
+                    <SegmentedButtonItem icon="sap-icon://choropleth-chart" key="map" />
+                    <SegmentedButtonItem icon="sap-icon://horizontal-bar-chart" key="bar" />
+                  </items>
+                </SegmentedButton>
+                <ToolbarSpacer></ToolbarSpacer>
+                <Text id="idCountryCount"></Text>
+                <ToolbarSpacer></ToolbarSpacer>
+                <Label text="合拍片仅计入主制片国"></Label>
+                <Switch id="idMultipleCountrySwitch" state="true"></Switch>
+              </Toolbar>
+              <NavContainer id="idCountryNav">
+                <Page id="idCountryMapPage" showHeader="false">
+                  <core:HTML id="idCountryMapContent" afterRendering="drawMap"></core:HTML>
+                </Page>
+                <Page id="idCountryBarPage" showHeader="false">
+                  <core:HTML id="idCountryBarContent" afterRendering="drawBar"></core:HTML>
+                </Page>
+              </NavContainer>
+            </Page>
+            <Page id="idYearPage" showHeader="false" backgroundDesign="Solid" showNavButton="false">
+              <core:HTML id="idYearContent" afterRendering="drawYearChart"></core:HTML>
+            </Page>
+            <Page id="idRatingPage" showHeader="false" backgroundDesign="Solid" showNavButton="false">
+              <core:HTML id="idRatingPieContent" afterRendering="drawPie"></core:HTML>
+            </Page>
+            <Page id="idDirectorPage" showHeader="false" backgroundDesign="Solid" showNavButton="false">
+              <core:HTML id="idDirectorTreeContent" afterRendering="drawTreeMap"></core:HTML>
+            </Page>
+            <Page id="idActorPage" showHeader="false" backgroundDesign="Solid" showNavButton="false">
+              <core:HTML id="idActorBubbleContent" afterRendering="drawBubble"></core:HTML>
+            </Page>
+            <Page id="idCategoryPage" showHeader="false" backgroundDesign="Solid" showNavButton="false">
+              <core:HTML id="idCategoryContent" afterRendering="drawCategory"></core:HTML>
+            </Page>
+          </detailPages>
+          <masterPages>
+            <Page id="master" showHeader="false" backgroundDesign="List">
+              <List mode="SingleSelectMaster" itemPress="onItemPress">
+                <StandardListItem title="综合" type="Active" icon="sap-icon://home" />
+                <StandardListItem title="国别" type="Active" icon="sap-icon://choropleth-chart" />
+                <StandardListItem title="年份" type="Active" icon="sap-icon://history" />
+                <StandardListItem title="评分" type="Active" icon="sap-icon://favorite" />
+                <StandardListItem title="导演" type="Active" icon="sap-icon://video" />
+                <StandardListItem title="演员" type="Active" icon="sap-icon://person-placeholder" />
+                <!-- <StandardListItem title="类型" type="Active" icon="sap-icon://tree" /> -->
+              </List>
+            </Page>
+          </masterPages>
+        </SplitContainer>
+      </content>
+    </Page>
+  </App>
+</mvc:View>

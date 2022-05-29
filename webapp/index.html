@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>My Movie Data Analysis</title>
+  <script id="sap-ui-bootstrap" src="https://openui5.hana.ondemand.com/resources/sap-ui-core.js"
+    data-sap-ui-theme="sap_belize" data-sap-ui-libs="sap.m, sap.ui.layout, sap.tnt"
+    data-sap-ui-resourceroots='{"Quickstart": "./"}' data-sap-ui-async="true"></script>
+  <script>
+    sap.ui.getCore().attachInit(function () {
+      sap.ui.require(["sap/ui/core/mvc/XMLView"], function (XMLView) {
+        XMLView.create({ viewName: "Quickstart.App" }).then(function (oView) {
+          oView.placeAt("content");
+        });
+      });
+    });
+  </script>
+  <script src="scripts/d3.v7.min.js" charset="utf-8"></script>
+  <!-- <script src="bundle.js"></script> -->
+  <!-- <script src="https://cdn.jsdelivr.net/npm/d3@7"></script> -->
+  <!-- <script src="scripts/require.js"></script> -->
+  <script src="scripts/jquery-csv.js"></script>
+  <script src="scripts/jquery-3.2.1.min.js"></script>
+  <script src="scripts/raphael-min.js"></script>
+  <!-- <script src="detworldLoader.js?v=2.5"></script> -->
+</head>
+
+<body class="sapUiBody" id="content"></body>
+
+</html>

@@ -1,0 +1,22 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:f="sap.ui.layout.form" xmlns:core="sap.ui.core">
+  <Dialog title="设置">
+    <content>
+      <f:SimpleForm editable="true" layout="ResponsiveGridLayout" labelSpanL="4" labelSpanM="4">
+        <f:content>
+          <Label text="影片类型" />
+          <CheckBox text="电影" enabled="false" selected="true" />
+          <CheckBox text="电视剧" enabled="false" selected="true" />
+          <CheckBox text="短片" selected="{Settings>/short}" />
+          <CheckBox text="脱口秀" selected="{Settings>/talkShow}" />
+          <CheckBox text="真人秀" selected="{Settings>/realityShow}" />
+        </f:content>
+      </f:SimpleForm>
+    </content>
+    <beginButton>
+      <Button text="保存" press="onSettingsSave"></Button>
+    </beginButton>
+    <endButton>
+      <Button text="取消" press="onCancel"></Button>
+    </endButton>
+  </Dialog>
+</core:FragmentDefinition>
