@@ -10,22 +10,25 @@
 // import { createRequire } from 'module';
 
 sap.ui.define(
-  ["sap/ui/core/mvc/Controller", "sap/ui/model/json/JSONModel", "jquery.sap.global", "sap/ui/core/Fragment", "Quickstart/Util"],
-  function (Controller, JSONModel, $, Fragment, Util) {
+  ["sap/ui/core/mvc/Controller", "sap/ui/model/json/JSONModel", "jquery.sap.global", "sap/ui/core/Fragment", "Quickstart/Util", "Quickstart/model/formatter"],
+  function (Controller, JSONModel, $, Fragment, Util, formatter) {
     "use strict";
     // const cncut = jQuery.sap.require("cncut");
     const aRatingColor = ["#868282", "#eb4242", "#e6e642", "#fbaf25", "#49cce5", "#26cb0e"];// grey, red, yellow, orange, blue, green
     const aRatingColorReverse = ["#26cb0e", "#49cce5", "#fbaf25", "#e6e642", "#eb4242", "#868282"];
 
     return Controller.extend("Quickstart.App", {
+      formatter: formatter,
       onInit: function () {
         var that = this;
         this._MovieData = [];
-        // Util.drawMap();
+        this._MovieData2 = [];
         var oSettingsModel = new JSONModel({
           short: false,
           talkShow: false,
-          realityShow: false
+          realityShow: false,
+          coupleMode: false,
+          singleMode: true
         });
         this.getView().setModel(oSettingsModel, "Settings");
 
@@ -88,8 +91,8 @@ sap.ui.define(
         }
       },
 
-      onCoupleModePress: function (oEvent) {
-
+      booleanReverse: function () {
+        console.log("!");
       },
 
       onSettingsPress: function (oEvent) {
@@ -185,6 +188,37 @@ sap.ui.define(
         this.byId("idShortestCommentText").setText("你写得最短的短评是为电影《" + oShortestCommentMovie.title + "》所写，仅有" + oShortestCommentMovie.comment.length + "个字，内容是'" + oShortestCommentMovie.comment + "'；");
         this.byId("idCommentLengthText").setText("你写得最长的短评是为电影《" + oLongestCommentMovie.title + "》所写，写了" + oLongestCommentMovie.comment.length + "个字，如下：");
         this.byId("idCommentText").setText(oLongestCommentMovie.comment);
+      },
+
+      onCoupleModePress: function (oEvent) {
+        // Couple mode
+        if (oEvent.getSource().getPressed()) {
+          var that = this;
+          var i, k, iSameMovie = 0, iSameRating = 0;
+          this.getView().getModel("Settings").setProperty("/coupleMode", true);
+          this.getView().getModel("Settings").setProperty("/singleMode", false);
+
+
+          // Get another's data
+          d3.csv('data2.csv').then(function (data) {
+            that._MovieData2 = that.processData(data);
+            for (i = 0; i < that._MovieData.length; i++) {
+              for (k = 0; k < that._MovieData2.length; k++) {
+                if (that._MovieData[i].link === that._MovieData2[k].link) {
+                  iSameMovie++;
+                  if (that._MovieData[i].myRating === that._MovieData2[k].myRating) {
+                    iSameRating++;
+                  }
+                  break;
+                }
+              }
+            }
+            that.byId("idCoupleSummaryText").setText("你看过" + that._MovieData.length + "部电影/电视剧，TA看过" + that._MovieData2.length + "部，其中重合的一共" + iSameMovie + "部。在这些你们共同看过的片子中，你们打分相同的一共" + iSameRating + "部，占比" + ((iSameRating / iSameMovie) * 100).toFixed(2) + "%");
+          });
+        } else {
+          this.getView().getModel("Settings").setProperty("/coupleMode", false);
+          this.getView().getModel("Settings").setProperty("/singleMode", true);
+        }
       },
 
       drawWordCloud: function () {
@@ -319,7 +353,7 @@ sap.ui.define(
           data: aResultData,
           key: key,
           id: "stacked-bar",
-          color: aRatingColorReverse,
+          color: aRatingColor,
           category: "country"
         });
       },
@@ -511,7 +545,7 @@ sap.ui.define(
       },
 
       drawTreeMap: function () {
-        if (!this.byId("idDirectorTreeContent").getContent()) {
+        if (this.byId("idDirectorTreeContent").getContent() === "<div><div id='tree-map'></div></div>") {
           var data = this.getTreeMapData(this._MovieData);
           // If id and parentId options are specified, or the path option, use d3.stratify
           // to convert tabular data to a hierarchy; otherwise we assume that the data is

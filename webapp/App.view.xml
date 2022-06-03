@@ -9,17 +9,22 @@
         <SplitContainer id="idSplitContainer" initialDetail="detail" initialMaster="master">
           <detailPages>
             <Page id="idSummaryPage" showHeader="false" backgroundDesign="Solid" showNavButton="false">
-              <Panel>
+              <Panel id="idSummaryPanel" visible="{Settings>/singleMode}">
                 <VBox>
                   <Text id="idSummaryText"></Text>
                   <Text id="idCompareText"></Text>
                 </VBox>
               </Panel>
-              <Panel>
+              <Panel id="idCommentSummaryPanel" visible="{Settings>/singleMode}">
                 <VBox>
                   <Text id="idShortestCommentText"></Text>
                   <Text id="idCommentLengthText"></Text>
                   <Text id="idCommentText"></Text>
+                </VBox>
+              </Panel>
+              <Panel id="idCoupleSummaryPanel" visible="{Settings>/coupleMode}">
+                <VBox>
+                  <Text id="idCoupleSummaryText"></Text>
                 </VBox>
               </Panel>
             </Page>
