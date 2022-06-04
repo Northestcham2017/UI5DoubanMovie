@@ -293,12 +293,9 @@ sap.ui.define(
       },
 
       drawBar: function () {
-        // var that = this;
         var aOriginalData = this._MovieData;
         var i, aResultData = [], aCountryList = [];
         for (i = 0; i < aOriginalData.length; i++) {
-          // var sBrief = aOriginalData[i].简介;
-          // var sCountry = sBrief.split("/")[1] ? sBrief.split("/")[1].trim() : "";
           var sCountry = aOriginalData[i].country;
           if (this.byId("idMultipleCountrySwitch").getState()) {
             // 合拍片仅计入主制片国
@@ -307,7 +304,6 @@ sap.ui.define(
             }
           }
           if (!aCountryList.includes(sCountry)) {
-            // } else {
             aCountryList.push(sCountry);
             var oDataItem = {
               "country": sCountry,
@@ -324,7 +320,6 @@ sap.ui.define(
           var iIndex = aCountryList.indexOf(sCountry);
           aResultData[iIndex]["total"]++;
           var sRating = aOriginalData[i].myRating;
-          // var sRating = aOriginalData[i].我的评分;
           switch (sRating) {
             case "1":
               aResultData[iIndex]["1star"]++;
@@ -352,6 +347,7 @@ sap.ui.define(
         this.drawStackedBar({
           data: aResultData,
           key: key,
+          sort: "total",
           id: "stacked-bar",
           color: aRatingColor,
           category: "country"
@@ -365,22 +361,22 @@ sap.ui.define(
           sId = config.id,
           sCategory = config.category,
           aColor = config.color,
+          sSort = config.sort,
           margin = { top: 20, right: 20, bottom: 30, left: 150 },
-          // parseDate = d3.timeParse("%m/%Y"),
           width = 960 - margin.left - margin.right,
           height = 900 - margin.top - margin.bottom,
           xScale = d3.scaleLinear().rangeRound([0, width]),
           yScale = d3.scaleBand().rangeRound([height, 0]).padding(0.1),
           color = d3.scaleOrdinal(aColor),
-          // color = d3.scaleOrdinal(d3.schemeCategory10),
           xAxis = d3.axisBottom(xScale),
           yAxis = d3.axisLeft(yScale),
-          // yAxis = d3.axisLeft(yScale).tickFormat(d3.timeFormat("%b")),
           svg = d3.select("#" + sId).append("svg")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
+            .attr("class", "layers")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
 
         var stack = d3.stack()
           .keys(stackKey)
@@ -388,7 +384,7 @@ sap.ui.define(
           .offset(d3.stackOffsetNone);
 
         var layers = stack(data);
-        data.sort(function (a, b) { return a.total - b.total; });
+        data.sort(function (a, b) { return a[sSort] - b[sSort]; });
         yScale.domain(data.map(function (d) { return d[sCategory].trim(); }));
         // yScale.domain(data.map(function (d) { return parseDate(d.date); }));
         xScale.domain([0, d3.max(layers[layers.length - 1], function (d) {
@@ -418,6 +414,38 @@ sap.ui.define(
           .attr("class", "axis axis--y")
           .attr("transform", "translate(0,0)")
           .call(yAxis);
+
+        svg.selectAll(".layer")
+          .append("text")
+          .selectAll("tspan")
+          .data(function (d) {
+            return d;
+          })
+          .join("tspan")
+          .attr("y", function (d) { return parseInt(yScale(d.data[sCategory]), 10) + 8; })
+          .attr("x", 2)
+          .attr("fill", "black")
+          .attr("font-size", "10")
+          .attr("visibility", function (d) {
+            if (this.parentElement.parentElement.style.fill === "rgb(160, 155, 155)") {
+              return "hidden";
+            }
+          })
+          .text(function (d) {
+            if (d.data.year) {
+              var fRatio = (d.data["5star"] / d.data["total"] * 100).toFixed(2);
+
+              return fRatio > 0 && fRatio < 100 ? fRatio + "%" : "";
+            } else {
+              return "";
+            }
+          });
+
+        layer.selectAll("text").each(function () {
+          this.parentNode.parentNode.appendChild(this);
+        });
+
+
       },
 
       drawMap: function () {
@@ -431,23 +459,20 @@ sap.ui.define(
         var aOriginalData = this._MovieData;
 
         for (i = 0; i < aOriginalData.length; i++) {
-          // var sBrief = aOriginalData[i].简介;
-          // var sYear = sBrief.split("/")[0] ? sBrief.split("/")[0].trim() : "";
           var sYear = aOriginalData[i].year;
           if (!aYearList.includes(sYear)) {
-            // } else {
             aYearList.push(sYear);
             var oDataItem = {
               "year": sYear,
               "5star": 0,
-              "other": 0
+              "other": 0,
+              "total": 0
             };
             aResultData.push(oDataItem);
           }
           var iIndex = aYearList.indexOf(sYear);
           aResultData[iIndex]["total"]++;
           var sRating = aOriginalData[i].myRating;
-          // var sRating = aOriginalData[i].我的评分;
           switch (sRating) {
             case "5":
               aResultData[iIndex]["5star"]++;
@@ -461,8 +486,9 @@ sap.ui.define(
         this.drawStackedBar({
           data: aResultData,
           key: key,
+          sort: "year",
           id: "year-stacked-bar",
-          color: ["#26cb0e", "grey"],
+          color: ["#26cb0e", "rgb(160, 155, 155)"],
           category: "year"
         });
       },

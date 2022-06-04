@@ -55,7 +55,9 @@
               <core:HTML id="idYearContent" afterRendering="drawYearChart"></core:HTML>
             </Page>
             <Page id="idRatingPage" showHeader="false" backgroundDesign="Solid" showNavButton="false">
-              <core:HTML id="idRatingPieContent" afterRendering="drawPie"></core:HTML>
+              <Panel>
+                <core:HTML id="idRatingPieContent" afterRendering="drawPie"></core:HTML>
+              </Panel>
             </Page>
             <Page id="idDirectorPage" showHeader="false" backgroundDesign="Solid" showNavButton="false">
               <core:HTML id="idDirectorTreeContent" afterRendering="drawTreeMap"></core:HTML>
