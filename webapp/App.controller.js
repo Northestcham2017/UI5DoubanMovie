@@ -33,6 +33,12 @@ sap.ui.define(
         this.getView().setModel(oSettingsModel, "Settings");
 
 
+        var oSummaryModel = new JSONModel({
+          myLove: [],
+          doubanLove: []
+        });
+        this.getView().setModel(oSummaryModel, "Summary");
+
         d3.csv('data.csv').then(function (data) {
           that._MovieData = that.processData(data);
           that.byId("idSplitContainer").to(that.byId("idSummaryPage"));
@@ -151,10 +157,14 @@ sap.ui.define(
         var iTotalMovie = this._MovieData.length;
         var iDoubanAverageRating, iDoubanTotalRating = 0, iDoubanRatingAccount = 0, iMyAverageRating, iMyTotalRating = 0, iMyRatingAccount = 0;
         var iHighestGapMyLove = 0, iHighestGapDoubanLove = 0, oHighestGapMyLove, oHighestGapDoubanLove;
+        var aHighestGapMyLove = [], aHighestGapDoubanLove = [];
         var iLongestCommentLength = 0, iShortestCommentLength = 9999, oLongestCommentMovie, oShortestCommentMovie;
-        var i;
+        var i, k;
         for (i = 0; i < this._MovieData.length; i++) {
           if (this._MovieData[i].doubanRating && parseFloat(this._MovieData[i].doubanRating) > 0) {
+            var iGap = parseInt(this._MovieData[i].myRating) * 2 - parseFloat(this._MovieData[i].doubanRating, 10);
+            this._MovieData[i].gap = iGap.toFixed(1);
+
             iDoubanTotalRating += parseFloat(this._MovieData[i].doubanRating, 10);
             iDoubanRatingAccount++;
 
@@ -162,14 +172,38 @@ sap.ui.define(
               iMyTotalRating += parseInt(this._MovieData[i].myRating) * 2;
               iMyRatingAccount++;
 
-              if (parseInt(this._MovieData[i].myRating) * 2 - parseFloat(this._MovieData[i].doubanRating, 10) > iHighestGapMyLove) {
-                iHighestGapMyLove = parseInt(this._MovieData[i].myRating) * 2 - parseFloat(this._MovieData[i].doubanRating, 10);
-                oHighestGapMyLove = this._MovieData[i];
+              if (aHighestGapMyLove.length < 10) {
+                aHighestGapMyLove.push(this._MovieData[i]);
+              } else {
+                for (k = 0; k < aHighestGapMyLove.length; k++) {
+                  var iTopTenGapMyLove = parseInt(aHighestGapMyLove[k].myRating) * 2 - parseFloat(aHighestGapMyLove[k].doubanRating, 10);
+                  if (iGap > iTopTenGapMyLove) {
+                    aHighestGapMyLove.splice(k, 1, this._MovieData[i]);
+                    break;
+                  }
+                }
               }
-              if (parseFloat(this._MovieData[i].doubanRating, 10) - parseInt(this._MovieData[i].myRating) * 2 > iHighestGapDoubanLove) {
-                iHighestGapDoubanLove = parseFloat(this._MovieData[i].doubanRating, 10) - parseInt(this._MovieData[i].myRating) * 2;
-                oHighestGapDoubanLove = this._MovieData[i];
+
+              if (aHighestGapDoubanLove.length < 10) {
+                aHighestGapDoubanLove.push(this._MovieData[i]);
+              } else {
+                for (k = 0; k < aHighestGapDoubanLove.length; k++) {
+                  var iTopTenGapDoubanLove = parseInt(aHighestGapDoubanLove[k].myRating) * 2 - parseFloat(aHighestGapDoubanLove[k].doubanRating, 10);
+                  if (iGap < iTopTenGapDoubanLove) {
+                    aHighestGapDoubanLove.splice(k, 1, this._MovieData[i]);
+                    break;
+                  }
+                }
               }
+
+              // if (parseInt(this._MovieData[i].myRating) * 2 - parseFloat(this._MovieData[i].doubanRating, 10) > iHighestGapMyLove) {
+              //   iHighestGapMyLove = parseInt(this._MovieData[i].myRating) * 2 - parseFloat(this._MovieData[i].doubanRating, 10);
+              //   oHighestGapMyLove = this._MovieData[i];
+              // }
+              // if (parseFloat(this._MovieData[i].doubanRating, 10) - parseInt(this._MovieData[i].myRating) * 2 > iHighestGapDoubanLove) {
+              //   iHighestGapDoubanLove = parseFloat(this._MovieData[i].doubanRating, 10) - parseInt(this._MovieData[i].myRating) * 2;
+              //   oHighestGapDoubanLove = this._MovieData[i];
+              // }
             }
           }
           if (this._MovieData[i].comment.length > iLongestCommentLength) {
@@ -181,10 +215,14 @@ sap.ui.define(
             oShortestCommentMovie = this._MovieData[i];
           }
         }
+
+        this.getView().getModel("Summary").setProperty("/myLove", aHighestGapMyLove);
+        this.getView().getModel("Summary").setProperty("/doubanLove", aHighestGapDoubanLove);
+
         iDoubanAverageRating = (iDoubanTotalRating / iDoubanRatingAccount).toFixed(2);
         iMyAverageRating = (iMyTotalRating / iMyRatingAccount).toFixed(2);
         this.byId("idSummaryText").setText("你一共看过" + iTotalMovie + "部电影/电视剧，它们的豆瓣平均分为" + iDoubanAverageRating + "，你给它们打分的平均值为" + iMyAverageRating);
-        this.byId("idCompareText").setText("你的打分跟豆瓣网友差距最大的是《" + oHighestGapMyLove.title + "》（豆瓣评分" + oHighestGapMyLove.doubanRating + "，你的评分" + oHighestGapMyLove.myRating + "⭐️）和《" + oHighestGapDoubanLove.title + "》（豆瓣评分" + oHighestGapDoubanLove.doubanRating + "，你的评分" + oHighestGapDoubanLove.myRating + "⭐️）");
+        // this.byId("idCompareText").setText("你的打分跟豆瓣网友差距最大的是《" + oHighestGapMyLove.title + "》（豆瓣评分" + oHighestGapMyLove.doubanRating + "，你的评分" + oHighestGapMyLove.myRating + "⭐️）和《" + oHighestGapDoubanLove.title + "》（豆瓣评分" + oHighestGapDoubanLove.doubanRating + "，你的评分" + oHighestGapDoubanLove.myRating + "⭐️）");
         this.byId("idShortestCommentText").setText("你写得最短的短评是为电影《" + oShortestCommentMovie.title + "》所写，仅有" + oShortestCommentMovie.comment.length + "个字，内容是'" + oShortestCommentMovie.comment + "'；");
         this.byId("idCommentLengthText").setText("你写得最长的短评是为电影《" + oLongestCommentMovie.title + "》所写，写了" + oLongestCommentMovie.comment.length + "个字，如下：");
         this.byId("idCommentText").setText(oLongestCommentMovie.comment);

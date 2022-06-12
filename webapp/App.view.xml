@@ -12,7 +12,6 @@
               <Panel id="idSummaryPanel" visible="{Settings>/singleMode}">
                 <VBox>
                   <Text id="idSummaryText"></Text>
-                  <Text id="idCompareText"></Text>
                 </VBox>
               </Panel>
               <Panel id="idCommentSummaryPanel" visible="{Settings>/singleMode}">
@@ -26,6 +25,82 @@
                 <VBox>
                   <Text id="idCoupleSummaryText"></Text>
                 </VBox>
+              </Panel>
+              <Panel id="idComparePanel" visible="{Settings>/singleMode}">
+                <HBox justifyContent="SpaceBetween">
+                  <Table id="idCompareTableMyLove" items="{Summary>/myLove}" width="95%">
+                    <headerToolbar>
+                      <OverflowToolbar>
+                        <content>
+                          <Title text="你最喜欢的豆瓣差评电影top10" />
+                        </content>
+                      </OverflowToolbar>
+                    </headerToolbar>
+                    <columns>
+                      <Column>
+                        <Text text="标题" />
+                      </Column>
+                      <Column>
+                        <Text text="豆瓣评分" />
+                      </Column>
+                      <Column>
+                        <Text text="我的评分" />
+                      </Column>
+                      <Column>
+                        <Text text="偏差" />
+                      </Column>
+                    </columns>
+                    <items>
+                      <ColumnListItem>
+                        <cells>
+                          <Text text="{Summary>title}" />
+                          <Text text="{Summary>doubanRating}" />
+                          <HBox alignItems="Center">
+                            <Text text="{Summary>myRating}" />
+                            <Text text="⭐️" />
+                          </HBox>
+                          <Text text="{Summary>gap}" />
+                        </cells>
+                      </ColumnListItem>
+                    </items>
+                  </Table>
+                  <Table id="idCompareTableDoubanLove" items="{Summary>/doubanLove}">
+                    <headerToolbar>
+                      <OverflowToolbar>
+                        <content>
+                          <Title text="你最不喜欢的豆瓣好评电影top10" />
+                        </content>
+                      </OverflowToolbar>
+                    </headerToolbar>
+                    <columns>
+                      <Column>
+                        <Text text="标题" />
+                      </Column>
+                      <Column>
+                        <Text text="豆瓣评分" />
+                      </Column>
+                      <Column>
+                        <Text text="我的评分" />
+                      </Column>
+                      <Column>
+                        <Text text="偏差" />
+                      </Column>
+                    </columns>
+                    <items>
+                      <ColumnListItem>
+                        <cells>
+                          <Text text="{Summary>title}" />
+                          <Text text="{Summary>doubanRating}" />
+                          <HBox alignItems="Center">
+                            <Text text="{Summary>myRating}" />
+                            <Text text="⭐️" />
+                          </HBox>
+                          <Text text="{Summary>gap}" />
+                        </cells>
+                      </ColumnListItem>
+                    </items>
+                  </Table>
+                </HBox>
               </Panel>
             </Page>
             <Page id="idMapPage" showHeader="false" backgroundDesign="Solid" showNavButton="false">
